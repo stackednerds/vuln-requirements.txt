@@ -1,8 +1,3 @@
-# Web framework – multiple historical RCE & auth issues
-django==2.2.0
-
 # HTTP library – multiple high/critical CVEs
 requests==2.19.1
 
-# YAML parsing – unsafe load / RCE
-pyyaml==3.13
