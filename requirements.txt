@@ -1,3 +1,49 @@
-# HTTP library – multiple high/critical CVEs
-requests==2.20.0
+```python
+import requests
+from requests.adapters import HTTPAdapter
+from requests.packages.urllib3.util.ssl_ import SSL_PROTOCOL_TLS
 
+class TLSAdapter(HTTPAdapter):
+    def init_poolmanager(self, connections, maxsize, block=False):
+        self.poolmanager = super(TLSAdapter, self).poolmanager(
+            connections, maxsize, block, ssl_version=SSL_PROTOCOL_TLS)
+
+def fetch_data(url, proxy=None):
+    session = requests.Session()
+    session.mount('https://', TLSAdapter())
+
+    headers = {}
+    if proxy and 'user' in proxy and 'password' in proxy:
+        auth_string = f"{proxy['user']}:{proxy['password']}"
+        headers['Proxy-Authorization'] = f"Basic {requests.utils.quote(auth_string, safe='')}"
+
+    try:
+        response = session.get(url, proxies=proxy, headers=headers, verify=True, timeout=10)
+        response.raise_for_status()  # Raise an exception for bad status codes
+        return response.json()
+    except requests.exceptions.RequestException as e:
+        print(f"Error fetching data: {e}")
+        return None
+    finally:
+        session.close()
+
+if __name__ == '__main__':
+    # Example usage:
+    # Replace with your actual URL and proxy details
+    target_url = "https://jsonplaceholder.typicode.com/posts/1"
+    proxy_config = {
+        "http": "http://user:password@proxy.example.com:8080",
+        "https": "http://user:password@proxy.example.com:8080",
+        "user": "user",
+        "password": "password"
+    }
+
+    # If you don't want to use a proxy, set proxy_config to None
+    # proxy_config = None
+
+    data = fetch_data(target_url, proxy=proxy_config)
+
+    if data:
+        print("Successfully fetched data:")
+        print(data)
+```
