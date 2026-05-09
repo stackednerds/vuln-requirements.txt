@@ -1,3 +1,14 @@
-# HTTP library – multiple high/critical CVEs
-requests==2.20.0
-
+def extract_zipped_paths(path):
+    import tempfile, os, zipfile
+    # Create a unique, unpredictable temporary directory
+    tmpdir = tempfile.mkdtemp(prefix='requests_')
+    try:
+        with zipfile.ZipFile(path, 'r') as z:
+            z.extractall(tmpdir)
+            # Return the absolute paths to all extracted members
+            return [os.path.join(tmpdir, member) for member in z.namelist()]
+    except Exception:
+        # Cleanup on failure, caller must handle cleanup on success
+        import shutil
+        shutil.rmtree(tmpdir, ignore_errors=True)
+        raise
