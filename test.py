@@ -1,7 +1,7 @@
 import requests
 
 def trigger_vulnerability():
-    target_url = "http://example.com/redirect-to-attacker"
+    target_url = "https://example.com/redirect-to-attacker"
     response = requests.get(target_url, auth=('admin', 'secret_password'))
     return response.status_code
 
